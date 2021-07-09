@@ -1,7 +1,7 @@
 #ifndef CHATROOM_SERVER_H
 #define CHATROOM_SERVER_H
 
-#include "Common/Common.h"
+#include "../Common/Common.h"
 
 class Server
 {

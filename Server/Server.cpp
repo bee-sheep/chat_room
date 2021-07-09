@@ -5,7 +5,6 @@ Server::Server(){
     serverAddr.sin_family = PF_INET;
     serverAddr.sin_port = htons(SERVER_PORT);
     serverAddr.sin_addr.s_addr = inet_addr(SERVER_IP);
-
     listener = 0;
     epfd = 0;
 }
@@ -58,10 +57,19 @@ int Server::SendBroadcastMessage(int clientfd){
 
     msg.fromID = clientfd;
     msg.type = 0;
-    if(msg.content[0] == '\\' && isdigit(msg.content[1])){
+    int toi = 0;
+    int len1 = strlen(msg.content);
+    int k = 0;
+    for(int i = 1; i < len1; i++){
+        k=i;
+        if(isdigit(msg.content[i])){
+            toi = toi*10+msg.content[i]-'0';
+        }else break;
+    }
+    if(toi){
         msg.type = 1;
-        msg.toID = msg.content[1]-'0';
-        memcpy(msg.content, msg.content+2, sizeof(msg.content));
+        msg.toID = toi;
+        memcpy(msg.content, msg.content+k, sizeof(msg.content));
     }
 
     if(len == 0){
@@ -77,8 +85,6 @@ int Server::SendBroadcastMessage(int clientfd){
         if(cilents_list.size() == 1){
             memcpy(msg.content, CAUTION, sizeof(CAUTION));
             memcpy(send_buf, &msg, sizeof(msg));
-                                std::cout<<clientfd<<std::endl;
-
             send(clientfd, send_buf, sizeof(send_buf), 0);
             return len;
         }

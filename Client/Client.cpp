@@ -61,7 +61,7 @@ void Client::Start(){
     }else if(pid == 0){
         close(pipe_fd[0]);
         std::cout<<"please input the 'exit' to exit the chat room"<<std::endl;
-        std::cout<<"\\+clientid to private chat"<<std::endl;
+        std::cout<<"\\clientid\\ to private chat"<<std::endl;
 
         while(isClientwork){
             memset(msg.content, 0, sizeof(msg.content));
@@ -71,7 +71,18 @@ void Client::Start(){
             }else{
                 memset(send_buf, 0, BUF_SIZE);
                 memcpy(send_buf, &msg, sizeof(msg));
-                if(write(pipe_fd[1], send_buf, sizeof(send_buf))<0){
+                if(msg.content[0] != '\\'){
+                    std::cout<<"format error"<<std::endl;
+                    continue;
+                }int flag = -1;
+                int len = strlen(msg.content);
+                for(int i = 1; i < len; i++){
+                    if(msg.content[i] == '\\'){
+                        flag = i;
+                        break;
+                    }
+                }
+                if(flag != -1 && write(pipe_fd[1], send_buf, sizeof(send_buf))<0){
                     perror("fork error!");
                     exit(-1);
                 }
